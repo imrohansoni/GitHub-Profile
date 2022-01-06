@@ -92,6 +92,7 @@ a {
 }
 
 .search {
+  width: 200px;
   font-family: inherit;
   font-size: inherit;
   border: 1px solid rgba(138, 147, 158, 0.6);
@@ -99,7 +100,7 @@ a {
   color: #8b949e;
   padding: 2px 6px;
   border-radius: 4px;
-  transition: width 0.5s ease-in;
+  transition: width 0.2s ease-in;
 }
 
 .search::placeholder {
