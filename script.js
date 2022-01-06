@@ -2,6 +2,7 @@ const API_URL = `https://api.github.com/users/`;
 
 const main = document.querySelector('.main');
 const profile = document.querySelector('.profile');
+const form = document.querySelector('.form');
 const reposCount = document.querySelector('.repos_count');
 const navListContainer = document.querySelector('.nav_list_container');
 const navRepos = document.querySelector('.nav_repos');
@@ -17,18 +18,8 @@ const search = async (username) => {
   const data = await fetch(`${API_URL}${username}`);
   const p = await data.json();
 
-  const followers = await fetch(
-    `https://api.github.com/users/${username}/followers`
-  );
-
-  const following = await fetch(
-    `https://api.github.com/users/${username}/following`
-  );
-
   displayProfile(p);
   displayRepos(username);
-
-  // getLink(await followers.json());
 };
 
 const displayProfile = (d) => {
@@ -41,17 +32,17 @@ const displayProfile = (d) => {
             <a href="https://github.com/${d.login}" class="login">${d.login}</a>
             <span class="bio">${d.bio}</span>
             <div class="account">
-                <span class="followers">
+                <a class="followers">
                     <span class="followers_count">
                         <i class="fas fa-user-friends"></i> ${d.followers}
                     </span> followers
-                </span>
+                </a>
                 &middot;
-                <span class="following">
+                <a class="following">
                     <span class="following_count">
                         ${d.following}
                     </span> following
-                </span>
+                </a>
             </div>
             ${
               d.company
@@ -94,14 +85,46 @@ const displayProfile = (d) => {
   profile.insertAdjacentHTML('afterbegin', markup);
 };
 
-const form = document.querySelector('.form');
-const searchInput = document.querySelector('.search');
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
-  search(searchInput.value);
-});
+const searchUser = () => {
+  const searchInput = document.querySelector('.search');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    search(searchInput.value);
+  });
+};
 
-const getLink = function (link) {
+searchUser();
+const getLink = async () => {
+  profile.addEventListener('click', async (e) => {
+    if (e.target.closest('.following')) {
+      const following = await fetch(
+        `https://api.github.com/users/${mainUsername}/following`
+      );
+
+      const fl = await following.json();
+      displayLink(fl);
+    }
+    if (e.target.closest('.followers')) {
+      const followers = await fetch(
+        `https://api.github.com/users/${mainUsername}/followers`
+      );
+
+      const fr = await followers.json();
+
+      displayLink(fr);
+    }
+  });
+
+  navListContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.user_login')) {
+      search(e.target.closest('.user_login').dataset.login);
+    }
+  });
+};
+
+getLink();
+
+const displayLink = function (link) {
   navListContainer.innerHTML = ``;
   link.forEach((f) => {
     const markup = `
@@ -111,7 +134,7 @@ const getLink = function (link) {
           <img src="${f.avatar_url}" alt="">
         </div>
         <div>
-          <a href="https://github.com/${f.login}" class="user_login">${f.login}</a>
+          <a class="user_login" data-login="${f.login}">${f.login}</a>
        </div>
       </div>
     </li>
