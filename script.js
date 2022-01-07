@@ -22,6 +22,12 @@ const search = async (username) => {
   displayRepos(username);
 };
 
+const getColors = async (programingLanguage) => {
+  const data = await fetch('./color.json');
+  const colors = await data.json();
+  return colors[`${programingLanguage}`];
+};
+
 const displayProfile = (d) => {
   profile.innerHTML = ``;
   const markup = `
@@ -46,28 +52,28 @@ const displayProfile = (d) => {
             </div>
             ${
               d.company
-                ? `<span class="company">
+                ? `<span>
                 <i class="far fa-building"></i> ${d.company}
             </span>`
                 : ''
             }
             ${
               d.blog
-                ? `<a href="${d.blog}" class="blog">
+                ? `<a href="${d.blog}">
                 <i class="fas fa-link"></i> ${d.blog}
             </a>`
                 : ''
             }
             ${
               d.location
-                ? `<span class="location">
+                ? `<span>
                 <i class="fas fa-map-marker-alt"></i> ${d.location}
             </span>`
                 : ''
             }
             ${
               d.email
-                ? `<span class="email">
+                ? `<span>
                 <i class="far fa-envelope"></i> ${d.email}
             </span>`
                 : ''
@@ -75,7 +81,7 @@ const displayProfile = (d) => {
 
             ${
               d.twitter_username
-                ? `<a href="https://twitter.com/${d.twitter_username}" class="twitter_url">
+                ? `<a href="https://twitter.com/${d.twitter_username}">
                 <i class="fab fa-twitter"></i> ${d.twitter_username}
             </a>`
                 : ''
@@ -97,21 +103,12 @@ searchUser();
 const getLink = async () => {
   profile.addEventListener('click', async (e) => {
     if (e.target.closest('.following')) {
-      const following = await fetch(
-        `https://api.github.com/users/${mainUsername}/following`
-      );
-
-      const fl = await following.json();
-      displayLink(fl);
+      const following = await fetch(`${API_URL}${mainUsername}/following`);
+      displayLink(await following.json());
     }
     if (e.target.closest('.followers')) {
-      const followers = await fetch(
-        `https://api.github.com/users/${mainUsername}/followers`
-      );
-
-      const fr = await followers.json();
-
-      displayLink(fr);
+      const followers = await fetch(`${API_URL}${mainUsername}/followers`);
+      displayLink(await followers.json());
     }
   });
 
@@ -150,19 +147,32 @@ const displayRepos = async (username) => {
   const repos = await data.json();
 
   reposCount.textContent = repos.length;
-  repos.forEach((r) => {
+  repos.forEach(async (r) => {
     const markup = `
    <li>
       <div class="repositories">
         <div class="repos_name_container">
-          <a href="https://github.com/${username}/${r.name}" class="repos_name">${r.name}</a>
+          <a href="https://github.com/${username}/${
+      r.name
+    }" class="repos_name">${r.name}</a>
           <span class="repos_visibility">${r.visibility}</span>
         </div>
-          <a href="https://github.com/${username}/${r.name}/archive/refs/heads/master.zip" class="repos_download"><i class="fas fa-file-archive"></i>
+
+          <a href="https://github.com/${username}/${
+      r.name
+    }/archive/refs/heads/master.zip" class="repos_download"><i class="fas fa-file-archive"></i>
           </a>
-          <span class="repos_language">
-            <div class="circle"></div> ${r.language}
-          </span>
+
+          ${
+            r.language
+              ? `<span class="repos_language">
+            <div class="circle" style="background-color:${await getColors(
+              r.language
+            )}"></div> ${r.language}
+          </span>`
+              : ''
+          }
+          
       </div>
     </li>
   `;

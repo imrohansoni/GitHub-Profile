@@ -12,4 +12,6 @@
 - twitter account
 - all public repositories created by user
 
+### click on zip file icon to download the repositories.
+
 ![GitHub Profile](https://github.com/rohanSoni2033/GitHub-Profile/blob/master/GitHub_Profile.png 'Github Profile')
